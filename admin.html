@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Administração | Cidade Alta RP</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f5f6f8;
+color:#171717
+}
+header{
+background:#fff;
+border-bottom:1px solid #ddd;
+padding:17px 20px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:15px;
+position:sticky;
+top:0;
+z-index:10
+}
+.logo{
+display:flex;
+align-items:center;
+gap:12px
+}
+.logo-box{
+width:42px;
+height:42px;
+background:#111;
+color:#fff;
+border-radius:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold
+}
+.logo strong{display:block;font-size:17px}
+.logo span{font-size:12px;color:#777}
+button{
+border:0;
+border-radius:8px;
+padding:11px 15px;
+font-weight:bold;
+cursor:pointer
+}
+.sair{background:#eee}
+main{
+max-width:1150px;
+margin:auto;
+padding:25px 18px 40px
+}
+.topo{
+display:flex;
+justify-content:space-between;
+align-items:center;
+gap:15px;
+margin-bottom:22px
+}
+.topo h1{margin:0 0 6px;font-size:27px}
+.topo p{margin:0;color:#777}
+.status{
+padding:9px 12px;
+border-radius:8px;
+font-size:12px;
+font-weight:bold;
+background:#eee
+}
+.aberta{background:#e9f7ed;color:#16833b}
+.fechada{background:#eee;color:#666}
+.grid{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:12px;
+margin-bottom:20px
+}
+.card{
+background:#fff;
+border:1px solid #ddd;
+border-radius:12px;
+padding:17px
+}
+.card span{
+display:block;
+font-size:11px;
+color:#777;
+margin-bottom:8px
+}
+.card strong{font-size:25px}
+.card small{
+display:block;
+margin-top:5px;
+color:#999
+}
+.painel{
+background:#fff;
+border:1px solid #ddd;
+border-radius:14px;
+margin-bottom:20px;
+overflow:hidden
+}
+.painel-head{
+padding:17px 20px;
+border-bottom:1px solid #eee;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px
+}
+.painel-head h2{
+font-size:18px;
+margin:0
+}
+.painel-body{
+padding:20px
+}
+.acoes{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px
+}
+.acao{
+background:#f5f5f5;
+border:1px solid #ddd;
+text-align:left
+}
+.acao:hover{background:#eee}
+.verde{background:#111;color:#fff}
+.vermelho{
+background:#fff0f0;
+color:#b00020;
+border:1px solid #ffd0d0
+}
+.links{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:10px
+}
+.link{
+display:block;
+text-decoration:none;
+color:#111;
+background:#f5f5f5;
+border:1px solid #ddd;
+padding:15px;
+border-radius:9px;
+font-weight:bold
+}
+.link span{
+display:block;
+font-size:12px;
+font-weight:normal;
+color:#777;
+margin-top:4px
+}
+.contagem{
+background:#fafafa;
+border-top:1px solid #eee;
+padding:15px 20px;
+font-size:13px;
+color:#666
+}
+.modal{
+position:fixed;
+inset:0;
+background:rgba(0,0,0,.55);
+display:none;
+align-items:center;
+justify-content:center;
+padding:15px;
+z-index:30
+}
+.modal-box{
+background:#fff;
+width:100%;
+max-width:480px;
+border-radius:14px;
+padding:22px
+}
+.modal-box h2{margin:0 0 5px}
+.modal-box p{
+margin:0 0 18px;
+color:#777;
+font-size:13px
+}
+.form{
+display:grid;
+grid-template-columns:1fr 1fr;
+gap:12px
+}
+.campo label{
+display:block;
+font-size:11px;
+font-weight:bold;
+margin-bottom:5px;
+color:#555
+}
+.campo input,
+.campo select{
+width:100%;
+padding:12px;
+border:1px solid #ccc;
+border-radius:8px;
+font-size:15px;
+background:#fff
+}
+.campo.full{grid-column:1/-1}
+.modal-acoes{
+display:flex;
+gap:10px;
+margin-top:18px
+}
+.modal-acoes button{flex:1}
+.cancelar{background:#eee}
+.confirmar{background:#111;color:#fff}
+.erro{
+color:#c00;
+font-size:12px;
+margin-top:8px;
+display:none
+}
+.tempo{
+margin-top:15px;
+padding:14px;
+background:#f5f5f5;
+border-radius:9px;
+text-align:center
+}
+.tempo strong{
+display:block;
+font-size:22px;
+margin-top:4px
+}
+footer{
+text-align:center;
+color:#999;
+font-size:12px;
+padding:25px
+}
+@media(max-width:850px){
+.grid{grid-template-columns:repeat(2,1fr)}
+.links{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+header{padding:14px}
+main{padding:20px 12px}
+.topo{align-items:flex-start;flex-direction:column}
+.topo h1{font-size:23px}
+.acoes{grid-template-columns:1fr}
+.form{grid-template-columns:1fr}
+.campo.full{grid-column:auto}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+<div class="logo-box">CA</div>
+<div>
+<strong>Cidade Alta RP</strong>
+<span>Painel administrativo</span>
+</div>
+</div>
+
+<button class="sair" onclick="sair()">Sair</button>
+
+</header>
+
+<main>
+
+<div class="topo">
+
+<div>
+<h1>Administração</h1>
+<p>Controle da eleição e acompanhamento da apuração.</p>
+</div>
+
+<div id="status" class="status fechada">
+ELEIÇÃO ENCERRADA
+</div>
+
+</div>
+
+<div class="grid">
+
+<div class="card">
+<span>ELEITORES CADASTRADOS</span>
+<strong id="eleitores">0</strong>
+<small id="votaram">0 votaram</small>
+</div>
+
+<div class="card">
+<span>VOTOS REGISTRADOS</span>
+<strong id="totalVotos">0</strong>
+<small>Todos os cargos</small>
+</div>
+
+<div class="card">
+<span>VOTOS BRANCOS</span>
+<strong id="brancos">0</strong>
+<small>Todos os cargos</small>
+</div>
+
+<div class="card">
+<span>VOTOS NULOS</span>
+<strong id="nulos">0</strong>
+<small>Todos os cargos</small>
+</div>
+
+</div>
+
+<section class="painel">
+
+<div class="painel-head">
+<h2>Controle da eleição</h2>
+</div>
+
+<div class="painel-body">
+
+<div class="acoes">
+
+<button class="acao verde" onclick="abrirModal()">
+▶ CONFIGURAR E ABRIR ELEIÇÃO
+</button>
+
+<button class="acao" onclick="encerrar()">
+■ ENCERRAR ELEIÇÃO
+</button>
+
+<button class="acao" onclick="location.href='resultados.html'">
+📊 VER RESULTADOS
+</button>
+
+<button class="acao" onclick="location.href='urna.html'">
+🗳 TESTAR URNA
+</button>
+
+<button class="acao vermelho" onclick="resetar()">
+⚠ RESETAR ELEIÇÃO
+</button>
+
+</div>
+
+<div id="tempo" class="tempo" style="display:none">
+Tempo restante
+<strong id="contador">--:--:--</strong>
+</div>
+
+</div>
+
+</section>
+
+<section class="painel">
+
+<div class="painel-head">
+<h2>Gerenciamento</h2>
+</div>
+
+<div class="painel-body">
+
+<div class="links">
+
+<a class="link" href="candidatos.html">
+👤 Candidatos
+<span>Cadastrar e editar candidatos</span>
+</a>
+
+<a class="link" href="eleitores.html">
+🧑‍🤝‍🧑 Eleitores
+<span>Gerenciar eleitores</span>
+</a>
+
+<a class="link" href="resultados.html">
+📊 Resultados
+<span>Ver apuração completa</span>
+</a>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="painel">
+
+<div class="painel-head">
+<h2>Apuração por cargo</h2>
+</div>
+
+<div id="apuracao" class="contagem">
+Carregando...
+</div>
+
+</section>
+
+</main>
+
+<footer>
+Cidade Alta RP • Sistema de Eleições 2026
+</footer>
+
+<div id="modal" class="modal">
+
+<div class="modal-box">
+
+<h2>Abrir eleição</h2>
+<p>Defina a data e o horário de início e encerramento.</p>
+
+<div class="form">
+
+<div class="campo full">
+<label>DATA DE ABERTURA</label>
+<input
+id="di"
+inputmode="numeric"
+maxlength="10"
+placeholder="DD/MM/AAAA"
+oninput="mascaraData(this)">
+</div>
+
+<div class="campo">
+<label>HORA</label>
+<select id="hi"></select>
+</div>
+
+<div class="campo">
+<label>MINUTO</label>
+<select id="mi"></select>
+</div>
+
+<div class="campo full">
+<label>DATA DE ENCERRAMENTO</label>
+<input
+id="df"
+inputmode="numeric"
+maxlength="10"
+placeholder="DD/MM/AAAA"
+oninput="mascaraData(this)">
+</div>
+
+<div class="campo">
+<label>HORA</label>
+<select id="hf"></select>
+</div>
+
+<div class="campo">
+<label>MINUTO</label>
+<select id="mf"></select>
+</div>
+
+</div>
+
+<div id="erro" class="erro"></div>
+
+<div class="modal-acoes">
+<button class="cancelar" onclick="fecharModal()">Cancelar</button>
+<button class="confirmar" onclick="abrirEleicao()">Abrir eleição</button>
+</div>
+
+</div>
+
+</div>
+
+<script>
+const STATUS="cidadeAltaEleicaoStatus";
+const PERIODO="cidadeAltaEleicaoPeriodo";
+const VOTOS="votosCidadeAlta";
+const ELEITORES="eleitoresCidadeAlta";
+
+const CARGOS=[
+["federal","Deputado Federal"],
+["estadual","Deputado Estadual"],
+["governador","Governador"],
+["presidente","Presidente"]
+];
+
+if(sessionStorage.getItem("cidadeAltaAdmin")!=="true"){
+let u=prompt("Usuário:");
+let s=prompt("Senha:");
+
+if(u==="admin"&&s==="CA2026"){
+sessionStorage.setItem("cidadeAltaAdmin","true");
+}else{
+location.href="index.html";
+}
+
+}
+
+function votosBase(){
+return{
+federal:{},
+estadual:{},
+governador:{},
+presidente:{},
+brancos:{
+federal:0,
+estadual:0,
+governador:0,
+presidente:0
+},
+nulos:{
+federal:0,
+estadual:0,
+governador:0,
+presidente:0
+}
+};
+}
+
+function votos(){
+try{
+return Object.assign(votosBase(),
+JSON.parse(localStorage.getItem(VOTOS))||{});
+}catch(e){
+return votosBase();
+}
+}
+
+function eleitores(){
+try{
+return JSON.parse(localStorage.getItem(ELEITORES))||[];
+}catch(e){
+return[];
+}
+}
+
+function atualizar(){
+
+let e=eleitores();
+let v=votos();
+
+document.getElementById("eleitores").textContent=e.length;
+
+document.getElementById("votaram").textContent=
+e.filter(x=>x.votou).length+" votaram";
+
+let total=0;
+let br=0;
+let nu=0;
+
+CARGOS.forEach(([cargo])=>{
+
+Object.values(v[cargo]||{}).forEach(x=>{
+total+=Number(x)||0;
+});
+
+br+=Number(v.brancos?.[cargo])||0;
+nu+=Number(v.nulos?.[cargo])||0;
+
+});
+
+document.getElementById("totalVotos").textContent=total;
+document.getElementById("brancos").textContent=br;
+document.getElementById("nulos").textContent=nu;
+
+let ap="";
+
+CARGOS.forEach(([cargo,nome])=>{
+
+let validos=0;
+let qtd=0;
+
+Object.entries(v[cargo]||{}).forEach(([numero,quantidade])=>{
+validos+=Number(quantidade)||0;
+qtd++;
+});
+
+let branco=Number(v.brancos?.[cargo])||0;
+let nulo=Number(v.nulos?.[cargo])||0;
+let totalCargo=validos+branco+nulo;
+
+ap+=`
+<div style="margin-bottom:14px">
+<b>${nome}</b>
+<br>
+<span>
+${totalCargo} votos registrados
+• ${validos} válidos
+• ${branco} brancos
+• ${nulo} nulos
+</span>
+</div>
+`;
+
+});
+
+document.getElementById("apuracao").innerHTML=ap;
+
+verificarStatus();
+}
+
+function verificarStatus(){
+
+let s=localStorage.getItem(STATUS)||"encerrada";
+let p=null;
+
+try{
+p=JSON.parse(localStorage.getItem(PERIODO));
+}catch(e){}
+
+let agora=new Date();
+
+if(p){
+
+let inicio=new Date(p.inicio);
+let fim=new Date(p.fim);
+
+if(agora>=fim){
+s="encerrada";
+localStorage.setItem(STATUS,"encerrada");
+}
+
+if(agora>=inicio&&agora<fim){
+s="aberta";
+localStorage.setItem(STATUS,"aberta");
+}
+
+}
+
+const el=document.getElementById("status");
+
+if(s==="aberta"){
+el.textContent="ELEIÇÃO ABERTA";
+el.className="status aberta";
+mostrarContador();
+}else{
+el.textContent="ELEIÇÃO ENCERRADA";
+el.className="status fechada";
+document.getElementById("tempo").style.display="none";
+}
+
+}
+
+function mostrarContador(){
+
+let p;
+
+try{
+p=JSON.parse(localStorage.getItem(PERIODO));
+}catch(e){}
+
+if(!p)return;
+
+document.getElementById("tempo").style.display="block";
+
+function contar(){
+
+let fim=new Date(p.fim).getTime();
+let agora=Date.now();
+let resto=fim-agora;
+
+if(resto<=0){
+localStorage.setItem(STATUS,"encerrada");
+document.getElementById("tempo").style.display="none";
+verificarStatus();
+return;
+}
+
+let h=Math.floor(resto/3600000);
+let m=Math.floor(resto%3600000/60000);
+let s=Math.floor(resto%60000/1000);
+
+document.getElementById("contador").textContent=
+String(h).padStart(2,"0")+":"+
+String(m).padStart(2,"0")+":"+
+String(s).padStart(2,"0");
+}
+
+contar();
+
+clearInterval(window.contadorAdmin);
+window.contadorAdmin=setInterval(contar,1000);
+}
+
+function abrirModal(){
+
+document.getElementById("modal").style.display="flex";
+
+let agora=new Date();
+
+document.getElementById("di").value=dataTexto(agora);
+
+let fim=new Date(agora.getTime()+3600000);
+
+document.getElementById("df").value=dataTexto(fim);
+
+preencherHoras();
+
+document.getElementById("hi").value=String(agora.getHours()).padStart(2,"0");
+document.getElementById("mi").value=String(agora.getMinutes()).padStart(2,"0");
+
+document.getElementById("hf").value=String(fim.getHours()).padStart(2,"0");
+document.getElementById("mf").value=String(fim.getMinutes()).padStart(2,"0");
+
+}
+
+function fecharModal(){
+document.getElementById("modal").style.display="none";
+document.getElementById("erro").style.display="none";
+}
+
+function preencherHoras(){
+
+["hi","hf"].forEach(id=>{
+let el=document.getElementById(id);
+el.innerHTML="";
+
+for(let i=0;i<24;i++){
+let v=String(i).padStart(2,"0");
+el.innerHTML+=`<option value="${v}">${v}</option>`;
+}
+});
+
+["mi","mf"].forEach(id=>{
+let el=document.getElementById(id);
+el.innerHTML="";
+
+for(let i=0;i<60;i++){
+let v=String(i).padStart(2,"0");
+el.innerHTML+=`<option value="${v}">${v}</option>`;
+}
+});
+
+}
+
+function mascaraData(el){
+
+let v=el.value.replace(/\D/g,"").slice(0,8);
+
+if(v.length>4)
+v=v.slice(0,2)+"/"+v.slice(2,4)+"/"+v.slice(4);
+else if(v.length>2)
+v=v.slice(0,2)+"/"+v.slice(2);
+
+el.value=v;
+}
+
+function dataISO(txt){
+
+let p=txt.split("/");
+
+if(p.length!==3)return null;
+
+let d=Number(p[0]);
+let m=Number(p[1]);
+let a=Number(p[2]);
+
+if(!d||!m||!a||a<2020)return null;
+
+if(d<1||d>31||m<1||m>12)return null;
+
+return{d,m,a};
+}
+
+function dataTexto(d){
+
+return String(d.getDate()).padStart(2,"0")+
+"/"+
+String(d.getMonth()+1).padStart(2,"0")+
+"/"+
+d.getFullYear();
+
+}
+
+function criarData(texto,hora,minuto){
+
+let x=dataISO(texto);
+
+if(!x)return null;
+
+let d=new Date(
+x.a,
+x.m-1,
+x.d,
+Number(hora),
+Number(minuto),
+0,
+0
+);
+
+if(
+d.getFullYear()!==x.a||
+d.getMonth()!==x.m-1||
+d.getDate()!==x.d
+)return null;
+
+return d;
+}
+
+function abrirEleicao(){
+
+let inicio=criarData(
+document.getElementById("di").value,
+document.getElementById("hi").value,
+document.getElementById("mi").value
+);
+
+let fim=criarData(
+document.getElementById("df").value,
+document.getElementById("hf").value,
+document.getElementById("mf").value
+);
+
+let erro=document.getElementById("erro");
+
+if(!inicio||!fim){
+erro.textContent="Digite datas válidas.";
+erro.style.display="block";
+return;
+}
+
+if(fim<=inicio){
+erro.textContent="O encerramento precisa ser depois da abertura.";
+erro.style.display="block";
+return;
+}
+
+if(fim<=new Date()){
+erro.textContent="A data de encerramento precisa estar no futuro.";
+erro.style.display="block";
+return;
+}
+
+localStorage.setItem(PERIODO,JSON.stringify({
+inicio:inicio.toISOString(),
+fim:fim.toISOString()
+}));
+
+localStorage.setItem(STATUS,"aberta");
+
+fecharModal();
+atualizar();
+
+alert("Eleição aberta com sucesso!");
+
+}
+
+function encerrar(){
+
+if(!confirm("Deseja realmente encerrar a eleição?"))return;
+
+localStorage.setItem(STATUS,"encerrada");
+
+atualizar();
+
+}
+
+function resetar(){
+
+if(!confirm(
+"Isso apagará os votos e o período da eleição. Deseja continuar?"
+))return;
+
+localStorage.removeItem(VOTOS);
+localStorage.removeItem("cidadeAltaJaVotou2026");
+localStorage.removeItem(PERIODO);
+localStorage.setItem(STATUS,"encerrada");
+
+atualizar();
+
+alert("Eleição resetada.");
+
+}
+
+function sair(){
+
+sessionStorage.removeItem("cidadeAltaAdmin");
+location.href="index.html";
+
+}
+
+atualizar();
+
+setInterval(atualizar,1000);
+</script>
+
+</body>
+</html>

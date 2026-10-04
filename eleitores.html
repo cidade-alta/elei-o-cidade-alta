@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Eleitores | Cidade Alta RP</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+margin:0;
+font-family:Arial,sans-serif;
+background:#f5f6f8;
+color:#171717
+}
+header{
+background:#fff;
+border-bottom:1px solid #ddd;
+padding:17px 20px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:15px;
+position:sticky;
+top:0;
+z-index:10
+}
+.logo{
+display:flex;
+align-items:center;
+gap:12px
+}
+.logo-box{
+width:42px;
+height:42px;
+background:#111;
+color:#fff;
+border-radius:10px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold
+}
+.logo strong{display:block;font-size:17px}
+.logo span{font-size:12px;color:#777}
+button{
+border:0;
+border-radius:8px;
+padding:11px 15px;
+font-weight:bold;
+cursor:pointer
+}
+.voltar{background:#eee}
+main{
+max-width:1100px;
+margin:auto;
+padding:25px 18px 40px
+}
+.topo{
+margin-bottom:22px
+}
+.topo h1{
+margin:0 0 6px;
+font-size:27px
+}
+.topo p{
+margin:0;
+color:#777
+}
+.stats{
+display:grid;
+grid-template-columns:repeat(3,1fr);
+gap:12px;
+margin-bottom:20px
+}
+.card{
+background:#fff;
+border:1px solid #ddd;
+border-radius:12px;
+padding:17px
+}
+.card span{
+display:block;
+font-size:11px;
+color:#777;
+margin-bottom:8px
+}
+.card strong{font-size:25px}
+.painel{
+background:#fff;
+border:1px solid #ddd;
+border-radius:14px;
+margin-bottom:20px;
+overflow:hidden
+}
+.painel-head{
+padding:17px 20px;
+border-bottom:1px solid #eee;
+display:flex;
+align-items:center;
+justify-content:space-between;
+gap:10px
+}
+.painel-head h2{
+margin:0;
+font-size:18px
+}
+.painel-body{
+padding:20px
+}
+.form{
+display:grid;
+grid-template-columns:1fr auto;
+gap:10px
+}
+input{
+width:100%;
+padding:12px;
+border:1px solid #ccc;
+border-radius:8px;
+font-size:15px
+}
+.adicionar{
+background:#111;
+color:#fff
+}
+.barra{
+display:flex;
+gap:10px;
+margin-bottom:15px
+}
+.buscar{
+flex:1
+}
+.lista{
+border-top:1px solid #eee
+}
+.eleitor{
+display:grid;
+grid-template-columns:1fr auto auto;
+align-items:center;
+gap:12px;
+padding:15px 0;
+border-bottom:1px solid #eee
+}
+.eleitor:last-child{
+border-bottom:0
+}
+.nome{
+font-weight:bold
+}
+.id{
+display:block;
+font-size:11px;
+color:#999;
+margin-top:4px
+}
+.badge{
+padding:6px 8px;
+border-radius:6px;
+font-size:10px;
+font-weight:bold
+}
+.votou{
+background:#e9f7ed;
+color:#16833b
+}
+.nao{
+background:#eee;
+color:#666
+}
+.excluir{
+background:#fff0f0;
+color:#b00020;
+padding:8px 10px
+}
+.vazio{
+padding:25px 0;
+text-align:center;
+color:#777
+}
+.acoes{
+display:flex;
+gap:8px;
+flex-wrap:wrap
+}
+.acao{
+background:#eee
+}
+.limpar{
+background:#fff0f0;
+color:#b00020
+}
+footer{
+text-align:center;
+color:#999;
+font-size:12px;
+padding:25px
+}
+@media(max-width:700px){
+header{padding:14px}
+main{padding:20px 12px}
+.topo h1{font-size:23px}
+.stats{grid-template-columns:1fr}
+.form{grid-template-columns:1fr}
+.barra{flex-direction:column}
+.eleitor{
+grid-template-columns:1fr auto
+}
+.eleitor .excluir{
+grid-column:2;
+grid-row:1
+}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+
+<div class="logo">
+<div class="logo-box">CA</div>
+<div>
+<strong>Cidade Alta RP</strong>
+<span>Gerenciamento de eleitores</span>
+</div>
+</div>
+
+<button class="voltar" onclick="location.href='admin.html'">
+← Administração
+</button>
+
+</header>
+
+<main>
+
+<div class="topo">
+<h1>Eleitores</h1>
+<p>Cadastre e acompanhe os eleitores do Cidade Alta RP.</p>
+</div>
+
+<div class="stats">
+
+<div class="card">
+<span>CADASTRADOS</span>
+<strong id="total">0</strong>
+</div>
+
+<div class="card">
+<span>VOTARAM</span>
+<strong id="votaram">0</strong>
+</div>
+
+<div class="card">
+<span>AINDA NÃO VOTARAM</span>
+<strong id="faltam">0</strong>
+</div>
+
+</div>
+
+<section class="painel">
+
+<div class="painel-head">
+<h2>Cadastrar eleitor</h2>
+</div>
+
+<div class="painel-body">
+
+<div class="form">
+
+<input
+id="nome"
+type="text"
+placeholder="Nome completo do eleitor"
+maxlength="80"
+>
+
+<button class="adicionar" onclick="adicionar()">
++ ADICIONAR
+</button>
+
+</div>
+
+</div>
+
+</section>
+
+<section class="painel">
+
+<div class="painel-head">
+
+<h2>Lista de eleitores</h2>
+
+<div class="acoes">
+
+<button class="acao" onclick="carregar()">
+↻ Atualizar
+</button>
+
+<button class="limpar" onclick="limparTodos()">
+Limpar todos
+</button>
+
+</div>
+
+</div>
+
+<div class="painel-body">
+
+<div class="barra">
+
+<input
+class="buscar"
+id="busca"
+type="text"
+placeholder="Pesquisar eleitor..."
+oninput="carregar()"
+>
+
+</div>
+
+<div id="lista" class="lista"></div>
+
+</div>
+
+</section>
+
+</main>
+
+<footer>
+Cidade Alta RP • Sistema de Eleições 2026
+</footer>
+
+<script>
+
+const CHAVE="eleitoresCidadeAlta";
+
+function obter(){
+
+try{
+return JSON.parse(localStorage.getItem(CHAVE))||[];
+}catch(e){
+return[];
+}
+
+}
+
+function salvar(lista){
+
+localStorage.setItem(CHAVE,JSON.stringify(lista));
+
+}
+
+function adicionar(){
+
+let campo=document.getElementById("nome");
+let nome=campo.value.trim();
+
+if(!nome){
+alert("Digite o nome do eleitor.");
+campo.focus();
+return;
+}
+
+let lista=obter();
+
+lista.push({
+id:Date.now().toString(),
+nome:nome,
+votou:false
+});
+
+salvar(lista);
+
+campo.value="";
+
+carregar();
+
+}
+
+function carregar(){
+
+let lista=obter();
+
+let busca=document
+.getElementById("busca")
+.value
+.toLowerCase()
+.trim();
+
+let filtrados=lista.filter(x=>
+String(x.nome||"")
+.toLowerCase()
+.includes(busca)
+);
+
+document.getElementById("total").textContent=lista.length;
+
+let votaram=lista.filter(x=>x.votou).length;
+
+document.getElementById("votaram").textContent=votaram;
+
+document.getElementById("faltam").textContent=
+lista.length-votaram;
+
+let area=document.getElementById("lista");
+
+if(!filtrados.length){
+
+area.innerHTML=`
+<div class="vazio">
+Nenhum eleitor encontrado.
+</div>
+`;
+
+return;
+
+}
+
+area.innerHTML=filtrados.map(x=>`
+
+<div class="eleitor">
+
+<div>
+
+<div class="nome">
+${escapeHtml(x.nome)}
+</div>
+
+<span class="id">
+ID: ${escapeHtml(x.id)}
+</span>
+
+</div>
+
+<div class="badge ${x.votou?"votou":"nao"}">
+${x.votou?"VOTOU":"NÃO VOTOU"}
+</div>
+
+<button
+class="excluir"
+onclick="excluir('${x.id}')">
+Excluir
+</button>
+
+</div>
+
+`).join("");
+
+}
+
+function excluir(id){
+
+let lista=obter();
+
+let eleitor=lista.find(x=>x.id===id);
+
+if(!eleitor)return;
+
+if(!confirm(
+`Deseja excluir o eleitor "${eleitor.nome}"?`
+))return;
+
+lista=lista.filter(x=>x.id!==id);
+
+salvar(lista);
+
+carregar();
+
+}
+
+function limparTodos(){
+
+let lista=obter();
+
+if(!lista.length){
+alert("Não existem eleitores cadastrados.");
+return;
+}
+
+if(!confirm(
+"Isso excluirá todos os eleitores cadastrados. Deseja continuar?"
+))return;
+
+localStorage.removeItem(CHAVE);
+
+carregar();
+
+}
+
+function escapeHtml(text){
+
+return String(text)
+.replace(/&/g,"&amp;")
+.replace(/</g,"&lt;")
+.replace(/>/g,"&gt;")
+.replace(/"/g,"&quot;")
+.replace(/'/g,"&#039;");
+
+}
+
+document.getElementById("nome")
+.addEventListener("keydown",e=>{
+
+if(e.key==="Enter")adicionar();
+
+});
+
+carregar();
+
+</script>
+
+</body>
+</html>

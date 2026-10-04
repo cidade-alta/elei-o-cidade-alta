@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cadastro de Eleitor | Cidade Alta RP</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:Arial,sans-serif;
+ background:#f4f6f8;
+ color:#222;
+ min-height:100vh;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ padding:20px
+}
+.card{
+ width:100%;
+ max-width:430px;
+ background:#fff;
+ border-radius:18px;
+ padding:28px;
+ box-shadow:0 8px 30px #0002;
+ text-align:center
+}
+.logo{
+ width:58px;
+ height:58px;
+ margin:auto;
+ border-radius:14px;
+ background:#111;
+ color:#fff;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:22px;
+ font-weight:bold
+}
+h1{font-size:23px;margin:18px 0 6px}
+.sub{color:#777;font-size:14px;margin-bottom:25px}
+label{
+ display:block;
+ text-align:left;
+ font-size:14px;
+ font-weight:bold;
+ margin-bottom:7px
+}
+input{
+ width:100%;
+ padding:14px;
+ border:1px solid #ddd;
+ border-radius:10px;
+ font-size:16px;
+ outline:none;
+ margin-bottom:14px
+}
+input:focus{border-color:#111}
+button{
+ width:100%;
+ padding:14px;
+ border:0;
+ border-radius:10px;
+ background:#111;
+ color:#fff;
+ font-size:15px;
+ font-weight:bold;
+ cursor:pointer
+}
+button:disabled{opacity:.6}
+.resultado{
+ display:none;
+ margin-top:20px;
+ padding:18px;
+ border-radius:12px;
+ background:#f1f3f5;
+ text-align:left
+}
+.codigo{
+ font-size:25px;
+ font-weight:bold;
+ letter-spacing:2px;
+ text-align:center;
+ margin:10px 0 18px
+}
+.info{font-size:14px;margin:7px 0}
+.copiar{margin-top:12px;background:#198754}
+.novo{margin-top:10px;background:#ddd;color:#222}
+.aviso{font-size:12px;color:#777;margin-top:18px}
+.status{
+ display:none;
+ margin-top:15px;
+ padding:12px;
+ border-radius:10px;
+ font-size:13px
+}
+.erro{background:#ffe5e5;color:#b00020}
+.ok{background:#e5f8ed;color:#146c43}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<div class="logo">CA</div>
+
+<h1>Cadastro de Eleitor</h1>
+
+<div class="sub">
+Cidade Alta RP • Eleições 2026
+</div>
+
+<div id="formulario">
+
+<label for="discord">Nick do Discord</label>
+
+<input
+ id="discord"
+ type="text"
+ maxlength="40"
+ placeholder="Digite seu Nick do Discord"
+ autocomplete="off"
+>
+
+<button id="btnGerar" onclick="gerarCodigo()">
+GERAR CÓDIGO DE ELEITOR
+</button>
+
+</div>
+
+<div class="resultado" id="resultado">
+
+<div>Seu código de eleitor:</div>
+
+<div class="codigo" id="codigo"></div>
+
+<div class="info">
+<strong>Discord:</strong>
+<span id="nick"></span>
+</div>
+
+<button class="copiar" onclick="copiarCodigo()">
+COPIAR CÓDIGO
+</button>
+
+<button class="novo" onclick="location.reload()">
+GERAR OUTRO
+</button>
+
+</div>
+
+<div class="status" id="status"></div>
+
+<div class="aviso">
+Guarde seu código. Ele será usado para acessar a urna.
+</div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script>
+const SUPABASE_URL="https://gbzyjugjzxgymrgztujn.supabase.co";
+const SUPABASE_KEY="sb_publishable_wuYykRXH-zZ3GnEgj2o-Cg_xIe2aEdR";
+
+const db=window.supabase.createClient(
+ SUPABASE_URL,
+ SUPABASE_KEY
+);
+
+function mostrarStatus(msg,tipo="erro"){
+ const el=document.getElementById("status");
+ el.textContent=msg;
+ el.className="status "+tipo;
+ el.style.display="block";
+}
+
+function gerarId(){
+ return "CA-"+Math.floor(100000+Math.random()*900000);
+}
+
+async function gerarCodigo(){
+
+ const input=document.getElementById("discord");
+ const btn=document.getElementById("btnGerar");
+ const nick=input.value.trim();
+
+ if(!nick){
+  mostrarStatus("Digite seu Nick do Discord.");
+  return;
+ }
+
+ btn.disabled=true;
+ btn.textContent="GERANDO...";
+
+ try{
+
+  let codigo;
+  let existe=true;
+
+  while(existe){
+
+   codigo=gerarId();
+
+   const {data,error}=await db
+    .from("eleitores")
+    .select("id")
+    .eq("id",codigo)
+    .maybeSingle();
+
+   if(error) throw error;
+
+   existe=!!data;
+  }
+
+  const {error}=await db
+   .from("eleitores")
+   .insert([{
+    id:codigo,
+    discord:nick,
+    votou:false
+   }]);
+
+  if(error) throw error;
+
+  document.getElementById("codigo").textContent=codigo;
+  document.getElementById("nick").textContent=nick;
+
+  document.getElementById("formulario").style.display="none";
+  document.getElementById("resultado").style.display="block";
+  document.getElementById("status").style.display="none";
+
+ }catch(error){
+
+  console.error(error);
+
+  mostrarStatus(
+   "Não foi possível criar seu cadastro. Verifique a configuração do banco."
+  );
+
+  btn.disabled=false;
+  btn.textContent="GERAR CÓDIGO DE ELEITOR";
+ }
+}
+
+async function copiarCodigo(){
+
+ const codigo=document.getElementById("codigo").textContent;
+
+ try{
+  await navigator.clipboard.writeText(codigo);
+  mostrarStatus("Código copiado!", "ok");
+ }catch{
+  mostrarStatus("Não foi possível copiar automaticamente.");
+ }
+}
+</script>
+
+</body>
+</html>

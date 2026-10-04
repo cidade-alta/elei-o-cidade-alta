@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Candidatos | Cidade Alta RP</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial}
+body{background:#f5f6f8;color:#171717}
+header{background:#fff;border-bottom:1px solid #e5e7eb;padding:18px 25px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:12px}.logo-box{width:45px;height:45px;border-radius:12px;background:#111;color:#fff;display:grid;place-items:center;font-weight:bold}.logo h1{font-size:19px}.logo p{color:#777;font-size:12px}
+.container{max-width:1100px;margin:auto;padding:30px 20px}
+.top{display:flex;justify-content:space-between;align-items:center;margin-bottom:25px}
+.top p{color:#777;margin-top:7px}
+button{border:0;border-radius:10px;padding:11px 16px;font-weight:bold;cursor:pointer}
+.back,.edit{background:#e5e7eb}.save{background:#111;color:#fff}.delete{background:#dc2626;color:#fff}
+.section{background:#fff;border:1px solid #e5e7eb;border-radius:15px;padding:20px;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:15px}
+label{font-size:13px;font-weight:bold;color:#555}
+input,select{width:100%;padding:12px;margin-top:6px;border:1px solid #ddd;border-radius:9px;font-size:14px;background:#fff}
+.photo{display:flex;align-items:center;gap:15px;margin-top:10px}
+.photo img{width:75px;height:90px;object-fit:cover;border:1px solid #ddd;border-radius:8px;background:#eee}
+.list{display:grid;gap:12px}
+.candidato{display:flex;align-items:center;gap:15px;border:1px solid #e5e7eb;border-radius:12px;padding:12px}
+.candidato img{width:60px;height:70px;object-fit:cover;border-radius:7px;background:#eee}
+.info{flex:1}.info h3{font-size:16px}.info p{font-size:13px;color:#777;margin-top:5px}
+.acoes{display:flex;gap:7px}
+.hidden{display:none}
+@media(max-width:650px){
+.grid{grid-template-columns:1fr}
+.top{align-items:flex-start;gap:10px;flex-direction:column}
+.candidato{align-items:flex-start}
+.acoes{flex-direction:column}
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<div class="logo">
+<div class="logo-box">CA</div>
+<div>
+<h1>Cidade Alta RP</h1>
+<p>Gerenciamento de candidatos</p>
+</div>
+</div>
+<button class="back" onclick="location.href='admin.html'">← Admin</button>
+</header>
+
+<main class="container">
+
+<div class="top">
+<div>
+<h2>Candidatos</h2>
+<p>Cadastre e gerencie os candidatos da eleição.</p>
+</div>
+</div>
+
+<section class="section">
+<h3 id="titulo">Cadastrar candidato</h3><br>
+
+<div class="grid">
+
+<div>
+<label>Número</label>
+<input id="numero" inputmode="numeric" maxlength="5" placeholder="Número do candidato">
+</div>
+
+<div>
+<label>Nome</label>
+<input id="nome" placeholder="Nome completo">
+</div>
+
+<div>
+<label>Partido</label>
+<input id="partido" placeholder="Sigla do partido">
+</div>
+
+<div>
+<label>Cargo</label>
+<select id="cargo" onchange="limitarNumero()">
+<option value="federal">Deputado Federal</option>
+<option value="estadual">Deputado Estadual</option>
+<option value="governador">Governador</option>
+<option value="presidente">Presidente</option>
+</select>
+</div>
+
+</div>
+
+<br>
+
+<label>Foto</label>
+<div class="photo">
+<img id="preview" alt="">
+<input id="foto" type="file" accept="image/*" onchange="carregarFoto(event)">
+</div>
+
+<br>
+
+<button class="save" onclick="salvar()">Salvar candidato</button>
+<button id="cancelar" class="back hidden" onclick="cancelar()">Cancelar</button>
+
+</section>
+
+<section class="section">
+<h3>Candidatos cadastrados</h3><br>
+<div id="lista" class="list"></div>
+</section>
+
+</main>
+
+<script>
+const KEY="candidatosCidadeAlta";
+let candidatos={};
+let editando=null;
+let fotoAtual="";
+
+const $=id=>document.getElementById(id);
+
+function carregar(){
+try{
+candidatos=JSON.parse(localStorage.getItem(KEY)||"{}")
+}catch(e){
+candidatos={}
+}
+listar()
+}
+
+function salvar(){
+let numero=$("numero").value.trim();
+let nome=$("nome").value.trim();
+let partido=$("partido").value.trim();
+let cargo=$("cargo").value;
+
+let tamanhos={
+federal:4,
+estadual:5,
+governador:2,
+presidente:2
+};
+
+if(!/^\d+$/.test(numero)||numero.length!==tamanhos[cargo]){
+alert("Número inválido. Este cargo exige "+tamanhos[cargo]+" dígitos.");
+return
+}
+
+if(!nome){
+alert("Digite o nome do candidato.");
+return
+}
+
+let chave=cargo+"_"+numero;
+
+if(editando&&editando!==chave)delete candidatos[editando];
+
+if(candidatos[chave]&&!editando){
+alert("Esse número já está cadastrado para este cargo.");
+return
+}
+
+candidatos[chave]={
+numero,
+nome,
+partido,
+cargo,
+foto:fotoAtual
+};
+
+localStorage.setItem(KEY,JSON.stringify(candidatos));
+
+alert("Candidato salvo!");
+cancelar();
+carregar()
+}
+
+function carregarFoto(e){
+let arquivo=e.target.files[0];
+if(!arquivo)return;
+
+let reader=new FileReader();
+
+reader.onload=function(ev){
+let img=new Image();
+
+img.onload=function(){
+let max=400;
+let escala=Math.min(1,max/img.width,max/img.height);
+let c=document.createElement("canvas");
+
+c.width=img.width*escala;
+c.height=img.height*escala;
+
+let ctx=c.getContext("2d");
+ctx.drawImage(img,0,0,c.width,c.height);
+
+fotoAtual=c.toDataURL("image/jpeg",.55);
+$("preview").src=fotoAtual
+};
+
+img.src=ev.target.result
+};
+
+reader.readAsDataURL(arquivo)
+}
+
+function listar(){
+$("lista").innerHTML="";
+
+let arr=Object.values(candidatos);
+
+if(!arr.length){
+$("lista").innerHTML="<p style='color:#777'>Nenhum candidato cadastrado.</p>";
+return
+}
+
+arr.forEach(c=>{
+let nomes={
+federal:"Deputado Federal",
+estadual:"Deputado Estadual",
+governador:"Governador",
+presidente:"Presidente"
+};
+
+$("lista").innerHTML+=`
+<div class="candidato">
+<img src="${c.foto||""}">
+<div class="info">
+<h3>${c.nome}</h3>
+<p>Nº ${c.numero} • ${nomes[c.cargo]||c.cargo}</p>
+<p>${c.partido||"Sem partido"}</p>
+</div>
+<div class="acoes">
+<button class="edit" onclick="editar('${c.cargo}','${c.numero}')">Editar</button>
+<button class="delete" onclick="excluir('${c.cargo}','${c.numero}')">Excluir</button>
+</div>
+</div>`
+})
+}
+
+function editar(cargo,numero){
+let c=candidatos[cargo+"_"+numero];
+if(!c)return;
+
+editando=cargo+"_"+numero;
+
+$("numero").value=c.numero;
+$("nome").value=c.nome;
+$("partido").value=c.partido||"";
+$("cargo").value=c.cargo;
+fotoAtual=c.foto||"";
+$("preview").src=fotoAtual;
+
+$("titulo").textContent="Editar candidato";
+$("cancelar").classList.remove("hidden");
+
+window.scrollTo({top:0,behavior:"smooth"})
+}
+
+function excluir(cargo,numero){
+let chave=cargo+"_"+numero;
+
+if(!confirm("Excluir este candidato?"))return;
+
+delete candidatos[chave];
+localStorage.setItem(KEY,JSON.stringify(candidatos));
+carregar()
+}
+
+function cancelar(){
+editando=null;
+fotoAtual="";
+
+$("numero").value="";
+$("nome").value="";
+$("partido").value="";
+$("cargo").value="federal";
+$("foto").value="";
+$("preview").src="";
+
+$("titulo").textContent="Cadastrar candidato";
+$("cancelar").classList.add("hidden");
+limitarNumero()
+}
+
+function limitarNumero(){
+let c=$("cargo").value;
+let n={federal:4,estadual:5,governador:2,presidente:2}[c];
+
+$("numero").maxLength=n;
+$("numero").placeholder=n+" dígitos";
+}
+
+$("numero").addEventListener("input",function(){
+this.value=this.value.replace(/\D/g,"")
+});
+
+limitarNumero();
+carregar();
+</script>
+
+</body>
+</html>
