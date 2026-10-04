@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cidade Alta RP | Eleições 2026</title>
+
+<style>
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Arial,Helvetica,sans-serif;
+  background:#f5f7fa;
+  color:#111827;
+}
+
+header{
+  background:#fff;
+  border-bottom:1px solid #e5e7eb;
+  padding:18px 7%;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+}
+
+.logo{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-weight:bold;
+}
+
+.logo-icon{
+  width:42px;
+  height:42px;
+  border-radius:12px;
+  background:#111827;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+}
+
+.logo span{
+  font-size:18px;
+}
+
+.hero{
+  max-width:1100px;
+  margin:auto;
+  padding:70px 20px 45px;
+  text-align:center;
+}
+
+.tag{
+  display:inline-block;
+  background:#eef2ff;
+  color:#3730a3;
+  padding:8px 14px;
+  border-radius:30px;
+  font-size:13px;
+  font-weight:bold;
+  margin-bottom:18px;
+}
+
+h1{
+  margin:0;
+  font-size:clamp(34px,7vw,62px);
+  line-height:1;
+  letter-spacing:-2px;
+}
+
+.hero p{
+  max-width:650px;
+  margin:22px auto;
+  color:#6b7280;
+  font-size:17px;
+  line-height:1.6;
+}
+
+.botoes{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:12px;
+  margin-top:30px;
+}
+
+.btn{
+  width:100%;
+  max-width:330px;
+  padding:16px 22px;
+  border:0;
+  border-radius:12px;
+  font-weight:bold;
+  font-size:15px;
+  cursor:pointer;
+  text-decoration:none;
+  display:block;
+}
+
+.btn-votar{
+  background:#111827;
+  color:white;
+}
+
+.btn-discord{
+  background:#5865f2;
+  color:white;
+}
+
+.btn-admin{
+  background:white;
+  color:#111827;
+  border:1px solid #d1d5db;
+}
+
+.info{
+  max-width:1100px;
+  margin:0 auto;
+  padding:20px;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+}
+
+.card{
+  background:#fff;
+  border:1px solid #e5e7eb;
+  border-radius:18px;
+  padding:25px;
+}
+
+.card h3{
+  margin-top:0;
+  font-size:17px;
+}
+
+.card p{
+  color:#6b7280;
+  line-height:1.5;
+  font-size:14px;
+}
+
+footer{
+  text-align:center;
+  padding:45px 20px 25px;
+  color:#9ca3af;
+  font-size:13px;
+}
+
+@media(max-width:700px){
+  header{
+    padding:15px 20px;
+  }
+
+  .info{
+    grid-template-columns:1fr;
+  }
+
+  .hero{
+    padding-top:55px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">CA</div>
+    <span>Cidade Alta RP</span>
+  </div>
+</header>
+
+<section class="hero">
+
+  <div class="tag">ELEIÇÕES 2026</div>
+
+  <h1>ELEIÇÃO<br>CIDADE ALTA RP</h1>
+
+  <p>
+    Sistema oficial de eleições do Cidade Alta RP.
+    Vote, acompanhe o processo eleitoral e participe da escolha.
+  </p>
+
+  <div class="botoes">
+
+    <a class="btn btn-votar" href="urna.html">
+      VOTAR
+    </a>
+
+    <a
+      class="btn btn-discord"
+      href="https://discord.com/oauth2/authorize?client_id=1478195780132143237&response_type=code&redirect_uri=https%3A%2F%2Fcidade-alta.github.io%2Felei-o-cidade-alta%2Fcallback.html&scope=identify">
+      ENTRAR COM DISCORD
+    </a>
+
+    <a class="btn btn-admin" href="admin.html">
+      ÁREA ADMINISTRATIVA
+    </a>
+
+  </div>
+
+</section>
+
+<section class="info">
+
+  <div class="card">
+    <h3>🗳️ Votação</h3>
+    <p>
+      Vote para Deputado Federal, Deputado Estadual,
+      Governador e Presidente.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>🔐 Identificação</h3>
+    <p>
+      Faça seu cadastro usando sua conta do Discord
+      e receba seu código de eleitor.
+    </p>
+  </div>
+
+  <div class="card">
+    <h3>📊 Apuração</h3>
+    <p>
+      Os votos são registrados no sistema e podem
+      ser acompanhados pela administração.
+    </p>
+  </div>
+
+</section>
+
+<footer>
+  Cidade Alta RP • Sistema de Eleições 2026
+</footer>
+
+</body>
+</html>

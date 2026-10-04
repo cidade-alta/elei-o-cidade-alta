@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Cadastro Eleitoral | Cidade Alta RP</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:#f4f6f8;
+  font-family:Arial,sans-serif;
+  color:#111827;
+}
+
+.card{
+  width:90%;
+  max-width:430px;
+  background:#fff;
+  padding:32px 25px;
+  border-radius:20px;
+  text-align:center;
+  box-shadow:0 12px 35px #00000014;
+}
+
+.logo{
+  width:70px;
+  height:70px;
+  margin:0 auto 18px;
+  border-radius:18px;
+  background:#111827;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:22px;
+  font-weight:bold;
+}
+
+h1{
+  margin:0 0 12px;
+  font-size:24px;
+}
+
+p{
+  color:#6b7280;
+  line-height:1.5;
+}
+
+.codigo{
+  margin:22px 0;
+  padding:18px;
+  border-radius:14px;
+  background:#f1f5f9;
+  font-size:30px;
+  font-weight:bold;
+  letter-spacing:2px;
+}
+
+.info{
+  font-size:14px;
+  color:#6b7280;
+}
+
+button{
+  width:100%;
+  border:0;
+  padding:14px;
+  border-radius:12px;
+  background:#111827;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+  <div class="logo">CA</div>
+
+  <h1 id="titulo">Entrando...</h1>
+
+  <p id="mensagem">
+    Estamos verificando sua conta do Discord.
+  </p>
+
+  <div id="resultado" style="display:none">
+
+    <div class="codigo" id="codigo"></div>
+
+    <p class="info">
+      Guarde este código. Ele será usado para votar.
+    </p>
+
+    <p id="discord"></p>
+
+    <button onclick="location.href='index.html'">
+      VOLTAR AO INÍCIO
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+const params=new URLSearchParams(location.search);
+const code=params.get("code");
+
+async function entrar(){
+
+  if(!code){
+    document.getElementById("titulo").textContent="Erro";
+    document.getElementById("mensagem").textContent=
+      "Não foi possível obter a autorização do Discord.";
+    return;
+  }
+
+  try{
+
+    const resposta=await fetch(
+      "https://elei-o-cidade-alta-e1lunfse7-cidade-alta.vercel.app/api/discord?code="+
+      encodeURIComponent(code)
+    );
+
+    const dados=await resposta.json();
+
+    if(!resposta.ok){
+      throw new Error(
+        dados.error || "Não foi possível realizar o cadastro."
+      );
+    }
+
+    document.getElementById("titulo").textContent=
+      dados.existente
+      ? "Você já está cadastrado!"
+      : "Cadastro realizado!";
+
+    document.getElementById("mensagem").textContent=
+      dados.existente
+      ? "Sua conta do Discord já possui um código de eleitor."
+      : "Seu cadastro foi criado com sucesso.";
+
+    document.getElementById("codigo").textContent=dados.id;
+
+    document.getElementById("discord").textContent=
+      "Discord: "+dados.discord;
+
+    document.getElementById("resultado").style.display="block";
+
+  }catch(error){
+
+    console.error(error);
+
+    document.getElementById("titulo").textContent=
+      "Não foi possível concluir";
+
+    document.getElementById("mensagem").textContent=
+      error.message ||
+      "Ocorreu um erro ao realizar o cadastro.";
+  }
+}
+
+entrar();
+</script>
+
+</body>
+</html>
