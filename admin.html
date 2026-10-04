@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Painel Admin | Cidade Alta RP</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;font-family:Arial}
+body{background:#f5f6f8;color:#171717}
+header{background:#fff;border-bottom:1px solid #e5e7eb;padding:18px 25px;display:flex;justify-content:space-between;align-items:center}
+.logo{display:flex;align-items:center;gap:12px}.logo-box{width:45px;height:45px;border-radius:12px;background:#111;color:#fff;display:grid;place-items:center;font-weight:bold}.logo h1{font-size:19px}.logo p,small{color:#777;font-size:12px}
+.container{max-width:1150px;margin:auto;padding:30px 20px}
+.login{max-width:400px;margin:70px auto;background:#fff;border:1px solid #e5e7eb;border-radius:18px;padding:30px;box-shadow:0 8px 25px #0001}
+.login p,.top p{color:#777;margin:8px 0 22px}
+input,select{width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;margin:6px 0;font-size:14px;background:#fff;color:#111}
+button{border:0;border-radius:10px;padding:12px 17px;cursor:pointer;font-weight:bold}
+.btn{background:#111;color:#fff}.green{background:#16a34a;color:#fff}.red{background:#dc2626;color:#fff}.gray{background:#e5e7eb}
+.top,.section-title{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top{margin-bottom:25px}.top h2{font-size:25px}
+.cards,.results,.actions{display:grid;gap:15px}
+.cards{grid-template-columns:repeat(3,1fr);margin-bottom:20px}
+.card,.section{background:#fff;border:1px solid #e5e7eb;border-radius:15px;padding:20px}
+.card strong{display:block;font-size:28px;margin-top:8px}
+.section{margin-bottom:20px}.section-title{margin-bottom:18px}
+.status{padding:8px 12px;border-radius:20px;font-size:13px;font-weight:bold}
+.open{background:#dcfce7;color:#15803d}.closed{background:#fee2e2;color:#b91c1c}
+.timer{font-size:27px;font-weight:bold;margin:10px 0}.period{color:#666;line-height:1.6}
+.results{grid-template-columns:repeat(3,1fr)}
+.result{border:1px solid #e5e7eb;border-radius:14px;padding:18px}
+.result h4{font-size:12px;color:#777;text-transform:uppercase}
+.winner{font-size:19px;font-weight:bold;margin:10px 0 4px}
+.result p{color:#777;font-size:14px;line-height:1.6}
+.actions{grid-template-columns:repeat(4,1fr)}
+.action{padding:18px;border:1px solid #e5e7eb;border-radius:13px;text-decoration:none;color:#111}
+.action span{display:block;color:#777;font-size:13px;margin-top:6px}
+.notice{background:#f3f4f6;padding:14px;border-radius:10px;color:#555;font-size:14px}
+.hidden{display:none!important}
+.modal-bg{display:none;position:fixed;inset:0;background:#0009;align-items:center;justify-content:center;padding:20px;z-index:10}
+.modal{background:#fff;padding:25px;border-radius:18px;width:100%;max-width:430px}
+.modal p{color:#777;margin:8px 0 18px}
+.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:10px}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.date-title{font-size:12px;font-weight:bold;color:#555;margin-top:8px}
+.erro{color:#dc2626;font-size:12px;margin-top:5px}
+@media(max-width:800px){.cards,.results{grid-template-columns:1fr}.actions{grid-template-columns:1fr 1fr}.top{align-items:flex-start;flex-direction:column}}
+@media(max-width:500px){.actions{grid-template-columns:1fr}}
+</style>
+</head>
+
+<body>
+
+<div id="login" class="login">
+<div class="logo"><div class="logo-box">CA</div><div><h1>Cidade Alta RP</h1><p>Painel administrativo</p></div></div>
+<h2>Acesso administrativo</h2>
+<p>Entre para administrar a eleição.</p>
+<input id="user" placeholder="Usuário">
+<input id="pass" type="password" placeholder="Senha">
+<button class="btn" style="width:100%" onclick="entrar()">Entrar</button>
+</div>
+
+<div id="painel" class="hidden">
+<header>
+<div class="logo"><div class="logo-box">CA</div><div><h1>Cidade Alta RP</h1><p>Sistema oficial de eleições</p></div></div>
+<button class="gray" onclick="sair()">Sair</button>
+</header>
+
+<main class="container">
+
+<div class="top">
+<div><h2>Painel Administrativo</h2><p>Controle geral da eleição Cidade Alta RP.</p></div>
+<div id="status" class="status closed">ENCERRADA</div>
+</div>
+
+<div class="cards">
+<div class="card"><small>Votos registrados</small><strong id="tv">0</strong></div>
+<div class="card"><small>Candidatos</small><strong id="tc">0</strong></div>
+<div class="card"><small>Eleitores cadastrados</small><strong id="te">0</strong></div>
+</div>
+
+<section class="section">
+<div class="section-title">
+<h3>🗳️ Controle da urna</h3>
+<button id="abrir" class="green" onclick="modal()">Abrir urna</button>
+</div>
+
+<div id="aberta" class="hidden">
+<div id="timer" class="timer">--:--:--</div>
+<div id="periodo" class="period"></div><br>
+<button class="red" onclick="encerrar()">Encerrar agora</button>
+</div>
+
+<div id="fechada" class="notice">A urna está fechada. Defina um novo período para iniciar uma eleição.</div>
+</section>
+
+<section class="section">
+<div class="section-title">
+<h3>🏆 Resultado da eleição</h3>
+<button class="gray" onclick="atualizar()">Atualizar</button>
+</div>
+<div id="resultado" class="notice">A eleição ainda não foi encerrada.</div><br>
+<div id="resultados" class="results"></div>
+</section>
+
+<section class="section">
+<div class="section-title"><h3>📊 Administração</h3></div>
+<div class="actions">
+<a class="action" href="candidatos.html"><b>👤 Candidatos</b><span>Gerenciar candidatos.</span></a>
+<a class="action" href="eleitores.html"><b>🧑‍💼 Eleitores</b><span>Gerenciar eleitores.</span></a>
+<a class="action" href="resultados.html"><b>📊 Apuração</b><span>Ver resultados completos.</span></a>
+<a class="action" href="urna.html"><b>🗳️ Urna</b><span>Acessar votação.</span></a>
+</div>
+</section>
+
+<section class="section">
+<h3>⚙️ Controle de testes</h3>
+<p style="color:#777;margin:10px 0 15px;font-size:14px">Apaga os votos e libera novamente a urna.</p>
+<button class="red" onclick="resetar()">Resetar votação</button>
+</section>
+
+</main>
+</div>
+
+<div id="modalBg" class="modal-bg">
+<div class="modal">
+<h3>🗳️ Abrir urna</h3>
+<p>Defina quando a votação começa e termina.</p>
+
+<div class="date-title">Data de abertura</div>
+<input id="di" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" oninput="mascaraData(this)">
+
+<div class="row">
+<div>
+<div class="date-title">Hora</div>
+<select id="hi"></select>
+</div>
+<div>
+<div class="date-title">Minuto</div>
+<select id="mi"></select>
+</div>
+</div>
+
+<div class="date-title">Data de encerramento</div>
+<input id="df" inputmode="numeric" maxlength="10" placeholder="DD/MM/AAAA" oninput="mascaraData(this)">
+
+<div class="row">
+<div>
+<div class="date-title">Hora</div>
+<select id="hf"></select>
+</div>
+<div>
+<div class="date-title">Minuto</div>
+<select id="mf"></select>
+</div>
+</div>
+
+<div id="erro" class="erro"></div>
+
+<div class="modal-actions">
+<button class="gray" onclick="fecharModal()">Cancelar</button>
+<button class="green" onclick="abrir()">Abrir urna</button>
+</div>
+</div>
+</div>
+
+<script>
+const S="cidadeAltaEleicaoStatus",P="cidadeAltaEleicaoPeriodo",V="votosCidadeAlta";
+let int;
+const $=id=>document.getElementById(id);
+
+function entrar(){
+if($("user").value==="admin"&&$("pass").value==="CA2026"){
+sessionStorage.cidadeAltaAdmin="true";show()
+}else alert("Usuário ou senha incorretos.")
+}
+
+function show(){
+$("login").classList.add("hidden");
+$("painel").classList.remove("hidden");
+atualizar()
+}
+
+function sair(){
+sessionStorage.removeItem("cidadeAltaAdmin");
+location.reload()
+}
+
+function preencherSelects(){
+for(let i=0;i<24;i++){
+let x=String(i).padStart(2,"0");
+$("hi").innerHTML+=`<option value="${x}">${x}</option>`;
+$("hf").innerHTML+=`<option value="${x}">${x}</option>`
+}
+
+for(let i=0;i<60;i++){
+let x=String(i).padStart(2,"0");
+$("mi").innerHTML+=`<option value="${x}">${x}</option>`;
+$("mf").innerHTML+=`<option value="${x}">${x}</option>`
+}
+}
+
+function mascaraData(el){
+let v=el.value.replace(/\D/g,"").slice(0,8);
+if(v.length>4)v=v.slice(0,2)+"/"+v.slice(2,4)+"/"+v.slice(4);
+else if(v.length>2)v=v.slice(0,2)+"/"+v.slice(2);
+el.value=v
+}
+
+function dataTexto(d){
+let dia=String(d.getDate()).padStart(2,"0");
+let mes=String(d.getMonth()+1).padStart(2,"0");
+let ano=d.getFullYear();
+return `${dia}/${mes}/${ano}`
+}
+
+function dataISO(txt){
+let p=txt.split("/");
+if(p.length!==3)return null;
+
+let d=+p[0],m=+p[1],a=+p[2];
+
+if(!d||!m||!a||p[0].length!==2||p[1].length!==2||p[2].length!==4)return null;
+if(m<1||m>12||d<1||d>31)return null;
+
+let x=new Date(a,m-1,d);
+
+if(x.getFullYear()!==a||x.getMonth()!==m-1||x.getDate()!==d)return null;
+
+return {d,m,a}
+}
+
+function criarData(data,hora,minuto){
+let p=dataISO(data);
+if(!p)return null;
+
+return new Date(
+p.a,
+p.m-1,
+p.d,
+Number(hora),
+Number(minuto),
+0,
+0
+)
+}
+
+function modal(){
+let a=new Date(),f=new Date(a.getTime()+3600000);
+
+$("di").value=dataTexto(a);
+$("df").value=dataTexto(f);
+
+$("hi").value=String(a.getHours()).padStart(2,"0");
+$("mi").value=String(a.getMinutes()).padStart(2,"0");
+
+$("hf").value=String(f.getHours()).padStart(2,"0");
+$("mf").value=String(f.getMinutes()).padStart(2,"0");
+
+$("erro").textContent="";
+$("modalBg").style.display="flex"
+}
+
+function fecharModal(){
+$("modalBg").style.display="none"
+}
+
+function abrir(){
+$("erro").textContent="";
+
+let i=criarData($("di").value,$("hi").value,$("mi").value);
+let f=criarData($("df").value,$("hf").value,$("mf").value);
+
+if(!i||!f){
+$("erro").textContent="Digite as datas corretamente: DD/MM/AAAA.";
+return
+}
+
+if(f<=i){
+$("erro").textContent="O encerramento precisa ser depois da abertura.";
+return
+}
+
+if(f<=new Date()){
+$("erro").textContent="O horário de encerramento já passou.";
+return
+}
+
+localStorage.setItem(P,JSON.stringify({
+inicio:i.toISOString(),
+fim:f.toISOString()
+}));
+
+localStorage.setItem(S,"aberta");
+fecharModal();
+atualizar()
+}
+
+function encerrar(){
+if(confirm("Deseja encerrar a eleição agora?")){
+localStorage.setItem(S,"encerrada");
+atualizar()
+}
+}
+
+function periodo(){
+try{return JSON.parse(localStorage.getItem(P))}
+catch(e){return null}
+}
+
+function verificar(){
+let p=periodo(),ag=new Date();
+if(!p)return fechado();
+
+let i=new Date(p.inicio),f=new Date(p.fim);
+
+if(ag>=f){
+localStorage.setItem(S,"encerrada");
+return fechado()
+}
+
+if(ag<i)return programada(i);
+
+localStorage.setItem(S,"aberta");
+aberta(f)
+}
+
+function aberta(f){
+$("status").className="status open";
+$("status").textContent="ABERTA";
+$("abrir").textContent="Alterar período";
+$("aberta").classList.remove("hidden");
+$("fechada").classList.add("hidden");
+mostrarPeriodo();
+contador(f)
+}
+
+function programada(i){
+$("status").className="status";
+$("status").style="background:#fef3c7;color:#92400e";
+$("status").textContent="PROGRAMADA";
+$("abrir").textContent="Alterar período";
+$("aberta").classList.remove("hidden");
+$("fechada").classList.add("hidden");
+mostrarPeriodo();
+contador(i,true)
+}
+
+function fechado(){
+$("status").className="status closed";
+$("status").style="";
+$("status").textContent="ENCERRADA";
+$("abrir").textContent="Abrir urna";
+$("aberta").classList.add("hidden");
+$("fechada").classList.remove("hidden");
+$("timer").textContent="--:--:--"
+}
+
+function mostrarPeriodo(){
+let p=periodo();
+if(!p)return;
+
+let i=new Date(p.inicio),f=new Date(p.fim);
+
+$("periodo").innerHTML=
+`Abertura: <b>${i.toLocaleString("pt-BR")}</b><br>
+Encerramento: <b>${f.toLocaleString("pt-BR")}</b>`
+}
+
+function contador(destino,inicio=false){
+clearInterval(int);
+
+function x(){
+let n=Math.max(0,destino-new Date());
+let s=Math.floor(n/1000);
+let h=Math.floor(s/3600);
+let m=Math.floor(s%3600/60);
+let ss=s%60;
+
+$("timer").textContent=
+(inicio?"Inicia em ":"")+
+`${String(h).padStart(2,"0")}:${String(m).padStart(2,"0")}:${String(ss).padStart(2,"0")}`;
+
+if(n<=0){
+clearInterval(int);
+verificar()
+}
+}
+
+x();
+int=setInterval(x,1000)
+}
+
+function votos(){
+try{
+return JSON.parse(localStorage.getItem(V))||{
+estadual:{},governador:{},prefeito:{},
+brancos:{estadual:0,governador:0,prefeito:0},
+nulos:{estadual:0,governador:0,prefeito:0}
+}
+}catch(e){
+return{
+estadual:{},governador:{},prefeito:{},
+brancos:{},nulos:{}
+}
+}
+}
+
+function atualizar(){
+let c=JSON.parse(localStorage.getItem("candidatosCidadeAlta")||"{}");
+let e=JSON.parse(localStorage.getItem("eleitoresCidadeAlta")||"[]");
+let v=votos(),total=0;
+
+["estadual","governador","prefeito"].forEach(x=>{
+Object.values(v[x]||{}).forEach(n=>total+=+n);
+total+=+(v.brancos?.[x]||0);
+total+=+(v.nulos?.[x]||0)
+});
+
+$("tv").textContent=total;
+$("tc").textContent=Object.keys(c).length;
+$("te").textContent=e.length;
+
+resultados(c,v);
+verificar()
+}
+
+function resultados(c,v){
+let cargos=[
+["estadual","Deputado Estadual"],
+["governador","Governador"],
+["prefeito","Prefeito"]
+];
+
+$("resultados").innerHTML="";
+
+$("resultado").textContent=
+localStorage.getItem(S)==="encerrada"
+?"Eleição encerrada. Resultado final:"
+:"Eleição em andamento. Resultado parcial:";
+
+cargos.forEach(([id,nome])=>{
+let arr=Object.entries(v[id]||{}).sort((a,b)=>b[1]-a[1]);
+let x=arr[0],can=x?c[id+"_"+x[0]]:null;
+let valid=arr.reduce((a,b)=>a+ +b[1],0);
+let br=+(v.brancos?.[id]||0);
+let nu=+(v.nulos?.[id]||0);
+
+$("resultados").innerHTML+=`
+<div class="result">
+<h4>${nome}</h4>
+<div class="winner">${can?can.nome:"Nenhum voto"}</div>
+<p>
+${can?`${can.partido||""} • Nº ${x[0]}<br>
+🏆 ${x[1]} voto(s) • ${valid?((x[1]/valid)*100).toFixed(1):0}%`
+:"Ainda não há votos."}
+<br><br>
+Válidos: ${valid}<br>
+Brancos: ${br}<br>
+Nulos: ${nu}<br>
+Total: ${valid+br+nu}
+</p>
+</div>`
+})
+}
+
+function resetar(){
+if(!confirm("Apagar todos os votos?"))return;
+
+localStorage.removeItem(V);
+localStorage.removeItem("cidadeAltaJaVotou2026");
+localStorage.removeItem(P);
+localStorage.setItem(S,"encerrada");
+atualizar()
+}
+
+preencherSelects();
+
+if(sessionStorage.cidadeAltaAdmin==="true")show();
+
+setInterval(verificar,1000);
+</script>
+
+</body>
+</html>

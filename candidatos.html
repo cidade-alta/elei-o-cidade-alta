@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+
+<title>Candidatos - Cidade Alta RP</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    background:#f1f3f5;
+    color:#222;
+    padding:20px;
+}
+
+.container{
+    max-width:1050px;
+    margin:auto;
+}
+
+.topo{
+    background:#fff;
+    border:1px solid #e1e1e1;
+    border-radius:16px;
+    padding:20px;
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,.06);
+}
+
+.topo h1{
+    font-size:22px;
+}
+
+.topo p{
+    color:#777;
+    font-size:13px;
+    margin-top:5px;
+}
+
+.voltar{
+    background:#222;
+    color:#fff;
+    text-decoration:none;
+    padding:11px 15px;
+    border-radius:8px;
+    font-size:13px;
+    font-weight:bold;
+}
+
+.card{
+    background:#fff;
+    border:1px solid #e1e1e1;
+    border-radius:16px;
+    padding:20px;
+    margin-bottom:18px;
+    box-shadow:0 5px 20px rgba(0,0,0,.05);
+}
+
+.card h2{
+    font-size:17px;
+    margin-bottom:15px;
+}
+
+.form{
+    display:grid;
+    grid-template-columns:repeat(2,1fr);
+    gap:12px;
+}
+
+input,select{
+    width:100%;
+    padding:12px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    outline:none;
+}
+
+input:focus,select:focus{
+    border-color:#168a42;
+}
+
+.foto-box{
+    grid-column:1/-1;
+}
+
+.botao{
+    border:0;
+    padding:12px 18px;
+    border-radius:8px;
+    background:#168a42;
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.botao.sec{
+    background:#222;
+}
+
+.lista{
+    display:grid;
+    gap:10px;
+}
+
+.candidato{
+    border:1px solid #ddd;
+    border-radius:12px;
+    padding:13px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:15px;
+}
+
+.info{
+    display:flex;
+    align-items:center;
+    gap:13px;
+}
+
+.info img{
+    width:60px;
+    height:60px;
+    border-radius:8px;
+    object-fit:cover;
+    background:#eee;
+}
+
+.nome{
+    font-weight:900;
+}
+
+.detalhes{
+    color:#777;
+    font-size:12px;
+    margin-top:4px;
+}
+
+.acoes{
+    display:flex;
+    gap:7px;
+}
+
+.editar,.excluir{
+    border:0;
+    padding:8px 10px;
+    border-radius:6px;
+    cursor:pointer;
+    font-weight:bold;
+}
+
+.editar{
+    background:#eee;
+}
+
+.excluir{
+    background:#d93636;
+    color:#fff;
+}
+
+@media(max-width:650px){
+
+    .form{
+        grid-template-columns:1fr;
+    }
+
+    .topo{
+        align-items:flex-start;
+        gap:12px;
+    }
+
+    .candidato{
+        align-items:flex-start;
+    }
+
+    .acoes{
+        flex-direction:column;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<header class="topo">
+
+<div>
+<h1>Gerenciamento de Candidatos</h1>
+<p>Eleição Cidade Alta RP • 2026</p>
+</div>
+
+<a href="admin.html" class="voltar">
+← Voltar
+</a>
+
+</header>
+
+
+<div class="card">
+
+<h2 id="tituloFormulario">
+Cadastrar candidato
+</h2>
+
+<div class="form">
+
+<input
+id="numero"
+type="number"
+placeholder="Número"
+>
+
+<input
+id="nome"
+type="text"
+placeholder="Nome do candidato"
+>
+
+<input
+id="partido"
+type="text"
+placeholder="Partido"
+>
+
+<select id="cargo">
+
+<option value="estadual">
+Deputado Estadual
+</option>
+
+<option value="governador">
+Governador
+</option>
+
+<option value="prefeito">
+Prefeito
+</option>
+
+</select>
+
+<div class="foto-box">
+
+<input
+id="foto"
+type="file"
+accept="image/*"
+>
+
+</div>
+
+<button
+class="botao"
+onclick="salvar()"
+>
+Salvar candidato
+</button>
+
+<button
+class="botao sec"
+onclick="limpar()"
+>
+Limpar
+</button>
+
+</div>
+
+</div>
+
+
+<div class="card">
+
+<h2>Candidatos cadastrados</h2>
+
+<div id="lista" class="lista"></div>
+
+</div>
+
+</div>
+
+
+<script>
+
+let candidatos =
+JSON.parse(localStorage.getItem("candidatosCidadeAlta")) || {};
+
+let editando = null;
+let fotoAtual = "";
+
+
+const numero =
+document.getElementById("numero");
+
+const nome =
+document.getElementById("nome");
+
+const partido =
+document.getElementById("partido");
+
+const cargo =
+document.getElementById("cargo");
+
+const foto =
+document.getElementById("foto");
+
+
+foto.addEventListener("change",function(){
+
+    const arquivo = this.files[0];
+
+    if(!arquivo) return;
+
+    const reader =
+    new FileReader();
+
+    reader.onload = function(e){
+
+        const img =
+        new Image();
+
+        img.onload = function(){
+
+            const canvas =
+            document.createElement("canvas");
+
+            const max = 400;
+
+            let largura = img.width;
+            let altura = img.height;
+
+            if(largura > altura){
+
+                if(largura > max){
+                    altura *= max/largura;
+                    largura = max;
+                }
+
+            }else{
+
+                if(altura > max){
+                    largura *= max/altura;
+                    altura = max;
+                }
+
+            }
+
+            canvas.width = largura;
+            canvas.height = altura;
+
+            const ctx =
+            canvas.getContext("2d");
+
+            ctx.drawImage(
+                img,
+                0,
+                0,
+                largura,
+                altura
+            );
+
+            fotoAtual =
+            canvas.toDataURL(
+                "image/jpeg",
+                .55
+            );
+
+        };
+
+        img.src = e.target.result;
+
+    };
+
+    reader.readAsDataURL(arquivo);
+
+});
+
+
+function quantidadeDigitos(){
+
+    if(cargo.value === "estadual")
+        return 5;
+
+    return 2;
+
+}
+
+
+function salvar(){
+
+    const n =
+    numero.value.trim();
+
+    const no =
+    nome.value.trim();
+
+    const p =
+    partido.value.trim();
+
+    const c =
+    cargo.value;
+
+    if(!n || !no || !p){
+
+        alert("Preencha todos os campos.");
+
+        return;
+    }
+
+
+    const limite =
+    quantidadeDigitos();
+
+    if(n.length !== limite){
+
+        alert(
+            "Este cargo precisa de " +
+            limite +
+            " dígitos."
+        );
+
+        return;
+    }
+
+
+    const chave =
+    c + "_" + n;
+
+
+    if(editando && editando !== chave){
+
+        delete candidatos[editando];
+
+    }
+
+
+    candidatos[chave] = {
+
+        numero:n,
+
+        nome:no,
+
+        partido:p,
+
+        cargo:c,
+
+        foto:
+        fotoAtual || candidatos[chave]?.foto || ""
+
+    };
+
+
+    localStorage.setItem(
+        "candidatosCidadeAlta",
+        JSON.stringify(candidatos)
+    );
+
+
+    alert("Candidato salvo com sucesso.");
+
+    limpar();
+
+    renderizar();
+
+}
+
+
+function editar(chave){
+
+    const c =
+    candidatos[chave];
+
+    if(!c) return;
+
+    numero.value = c.numero;
+    nome.value = c.nome;
+    partido.value = c.partido;
+    cargo.value = c.cargo;
+
+    fotoAtual = c.foto || "";
+
+    editando = chave;
+
+    document.getElementById(
+        "tituloFormulario"
+    ).innerText =
+        "Editar candidato";
+
+    window.scrollTo({
+        top:0,
+        behavior:"smooth"
+    });
+
+}
+
+
+function excluir(chave){
+
+    if(!confirm(
+        "Deseja excluir este candidato?"
+    )) return;
+
+    delete candidatos[chave];
+
+    localStorage.setItem(
+        "candidatosCidadeAlta",
+        JSON.stringify(candidatos)
+    );
+
+    renderizar();
+
+}
+
+
+function limpar(){
+
+    numero.value = "";
+    nome.value = "";
+    partido.value = "";
+    cargo.value = "estadual";
+    foto.value = "";
+
+    fotoAtual = "";
+    editando = null;
+
+    document.getElementById(
+        "tituloFormulario"
+    ).innerText =
+        "Cadastrar candidato";
+
+}
+
+
+function nomeCargo(c){
+
+    if(c === "estadual")
+        return "Deputado Estadual";
+
+    if(c === "governador")
+        return "Governador";
+
+    return "Prefeito";
+
+}
+
+
+function renderizar(){
+
+    const lista =
+    document.getElementById("lista");
+
+    lista.innerHTML = "";
+
+    const valores =
+    Object.entries(candidatos);
+
+    if(!valores.length){
+
+        lista.innerHTML =
+        "<p style='color:#777'>Nenhum candidato cadastrado.</p>";
+
+        return;
+    }
+
+
+    valores.forEach(([chave,c])=>{
+
+        const item =
+        document.createElement("div");
+
+        item.className =
+        "candidato";
+
+        item.innerHTML = `
+
+            <div class="info">
+
+                <img
+                src="${c.foto || ""}"
+                >
+
+                <div>
+
+                    <div class="nome">
+                        ${c.nome}
+                    </div>
+
+                    <div class="detalhes">
+                        Nº ${c.numero}
+                        • ${c.partido}
+                        • ${nomeCargo(c.cargo)}
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div class="acoes">
+
+                <button
+                class="editar"
+                onclick="editar('${chave}')"
+                >
+                Editar
+                </button>
+
+                <button
+                class="excluir"
+                onclick="excluir('${chave}')"
+                >
+                Excluir
+                </button>
+
+            </div>
+
+        `;
+
+        lista.appendChild(item);
+
+    });
+
+}
+
+
+renderizar();
+
+</script>
+
+</body>
+</html>

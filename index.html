@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Eleição Cidade Alta RP</title>
+
+<style>
+*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+    font-family:Arial,Helvetica,sans-serif;
+}
+
+body{
+    min-height:100vh;
+    background:#f1f3f5;
+    color:#222;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:20px;
+}
+
+.container{
+    width:100%;
+    max-width:1050px;
+}
+
+.topo{
+    background:#fff;
+    border:1px solid #e1e1e1;
+    border-radius:18px;
+    padding:22px 28px;
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:20px;
+    box-shadow:0 6px 22px rgba(0,0,0,.07);
+    margin-bottom:20px;
+}
+
+.logo-area{
+    display:flex;
+    align-items:center;
+    gap:14px;
+}
+
+.logo{
+    width:55px;
+    height:55px;
+    border-radius:14px;
+    background:#222;
+    color:#fff;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:21px;
+    font-weight:900;
+    letter-spacing:-1px;
+}
+
+.titulo h1{
+    font-size:22px;
+    font-weight:900;
+    letter-spacing:.3px;
+}
+
+.titulo p{
+    color:#777;
+    font-size:13px;
+    margin-top:4px;
+}
+
+.status{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    background:#f5f5f5;
+    border:1px solid #e4e4e4;
+    padding:9px 13px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:700;
+    color:#555;
+}
+
+.status-ponto{
+    width:9px;
+    height:9px;
+    border-radius:50%;
+    background:#22a653;
+    box-shadow:0 0 0 4px rgba(34,166,83,.12);
+}
+
+.hero{
+    background:#fff;
+    border:1px solid #e1e1e1;
+    border-radius:22px;
+    padding:55px 30px;
+    text-align:center;
+    box-shadow:0 8px 28px rgba(0,0,0,.07);
+}
+
+.tag{
+    display:inline-block;
+    background:#222;
+    color:#fff;
+    padding:7px 13px;
+    border-radius:7px;
+    font-size:11px;
+    font-weight:800;
+    letter-spacing:1px;
+    margin-bottom:20px;
+}
+
+.hero h2{
+    font-size:42px;
+    line-height:1.05;
+    font-weight:900;
+    margin-bottom:12px;
+}
+
+.hero h2 span{
+    color:#168a42;
+}
+
+.hero p{
+    max-width:600px;
+    margin:0 auto;
+    color:#777;
+    font-size:15px;
+    line-height:1.6;
+}
+
+.botoes{
+    display:flex;
+    justify-content:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-top:32px;
+}
+
+.btn{
+    border:none;
+    text-decoration:none;
+    min-width:220px;
+    padding:16px 24px;
+    border-radius:11px;
+    font-size:14px;
+    font-weight:800;
+    cursor:pointer;
+    transition:.2s;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:8px;
+}
+
+.btn:hover{
+    transform:translateY(-2px);
+}
+
+.btn-votar{
+    background:#168a42;
+    color:#fff;
+    box-shadow:0 5px 14px rgba(22,138,66,.22);
+}
+
+.btn-admin{
+    background:#222;
+    color:#fff;
+}
+
+.info{
+    display:grid;
+    grid-template-columns:repeat(3,1fr);
+    gap:14px;
+    margin-top:20px;
+}
+
+.card{
+    background:#fff;
+    border:1px solid #e1e1e1;
+    border-radius:16px;
+    padding:20px;
+    box-shadow:0 5px 18px rgba(0,0,0,.05);
+}
+
+.card-icon{
+    width:38px;
+    height:38px;
+    border-radius:10px;
+    background:#f0f0f0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size:18px;
+    margin-bottom:12px;
+}
+
+.card h3{
+    font-size:14px;
+    margin-bottom:6px;
+}
+
+.card p{
+    color:#777;
+    font-size:12px;
+    line-height:1.5;
+}
+
+.rodape{
+    text-align:center;
+    color:#999;
+    font-size:11px;
+    margin-top:22px;
+}
+
+@media(max-width:700px){
+
+    .topo{
+        padding:18px;
+        align-items:flex-start;
+    }
+
+    .status{
+        display:none;
+    }
+
+    .hero{
+        padding:40px 20px;
+    }
+
+    .hero h2{
+        font-size:32px;
+    }
+
+    .info{
+        grid-template-columns:1fr;
+    }
+
+    .btn{
+        width:100%;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <header class="topo">
+
+        <div class="logo-area">
+
+            <div class="logo">
+                CA
+            </div>
+
+            <div class="titulo">
+                <h1>Cidade Alta RP</h1>
+                <p>Sistema oficial de eleições</p>
+            </div>
+
+        </div>
+
+        <div class="status">
+            <span class="status-ponto"></span>
+            Sistema online
+        </div>
+
+    </header>
+
+
+    <main>
+
+        <section class="hero">
+
+            <div class="tag">
+                ELEIÇÕES 2026
+            </div>
+
+            <h2>
+                ELEIÇÃO <span>CIDADE ALTA RP</span>
+            </h2>
+
+            <p>
+                Sistema de votação oficial da Cidade Alta RP.
+                Escolha seu candidato e registre seu voto de forma simples e segura.
+            </p>
+
+            <div class="botoes">
+
+                <a href="urna.html" class="btn btn-votar">
+                    🗳️ VOTAR
+                </a>
+
+                <a href="admin.html" class="btn btn-admin">
+                    ⚙️ ÁREA ADMINISTRATIVA
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <section class="info">
+
+            <div class="card">
+
+                <div class="card-icon">
+                    🗳️
+                </div>
+
+                <h3>
+                    Votação
+                </h3>
+
+                <p>
+                    Acesse a urna eletrônica e registre seu voto nos cargos disponíveis.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-icon">
+                    📊
+                </div>
+
+                <h3>
+                    Apuração
+                </h3>
+
+                <p>
+                    Acompanhe os votos registrados e os resultados da eleição pelo painel.
+                </p>
+
+            </div>
+
+
+            <div class="card">
+
+                <div class="card-icon">
+                    🔒
+                </div>
+
+                <h3>
+                    Sistema
+                </h3>
+
+                <p>
+                    Ambiente desenvolvido exclusivamente para as eleições da Cidade Alta RP.
+                </p>
+
+            </div>
+
+        </section>
+
+    </main>
+
+
+    <footer class="rodape">
+        Cidade Alta RP • Eleições 2026
+    </footer>
+
+</div>
+
+</body>
+</html>
